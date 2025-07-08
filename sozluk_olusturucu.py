@@ -2,18 +2,18 @@
 import os
 import csv
 import json
-
+#sayfalar klasoru kontrol edilir, yoksa olusturulur
 base_dir = os.path.dirname(os.path.abspath(__file__))
 klasor_yolu = os.path.join(base_dir, "sayfalar")
 if not os.path.exists(klasor_yolu):
     os.mkdir(klasor_yolu)
-
+#csv verileri islenir
 csv_yolu = os.path.join(base_dir, "veriler.csv")
 with open(csv_yolu, newline='', encoding="utf-8") as csvfile:
     reader = csv.reader(csvfile)
     veriler = sorted(list(reader), key=lambda x: x[0].lower())
 
-# ortak stiller
+# ortak stil sayfalarını olusturan kod blogu
 ortak_css = """
 <style>
     body {
@@ -57,7 +57,7 @@ ortak_css = """
 </style>
 """
 
-
+#islenen verilerle sayfalar olusturur
 for veri in veriler:
     kelime, tur, turkce, ekstra = veri
     dosya_yolu = os.path.join(klasor_yolu, f"{kelime}.html")
@@ -101,12 +101,12 @@ for veri in veriler:
 </body>
 </html>""")
 
-
+#arama sistemi için json hazır ediliyor
 veri_json_yolu = os.path.join(base_dir, "veriler.js")
 with open(veri_json_yolu, "w", encoding="utf-8") as f:
     f.write("const veriler = " + json.dumps(veriler, ensure_ascii=False) + ";")
 
-# index.html
+# index.html ana sayfa olusturumu
 index_yolu = os.path.join(base_dir, "index.html")
 with open(index_yolu, "w", encoding="utf-8") as index:
     index.write(f"""<!DOCTYPE html>
@@ -159,8 +159,7 @@ with open(index_yolu, "w", encoding="utf-8") as index:
     </div>
     <div class="footer">
         <a href="hakkinda.html">Hakkında</a> |
-        <a href="iletisim.html">İletişim</a> |
-        <a href="gizlilik.html">Gizlilik Politikası</a>
+        <a href="iletisim.html">İletişim</a>
     </div>
     <script src="veriler.js"></script>
     <script>
@@ -198,8 +197,7 @@ with open(index_yolu, "w", encoding="utf-8") as index:
 # sabit sayfaları oluşturmak için ayrılan alan
 for sayfa, baslik, icerik in [
     ("hakkinda.html", "Hakkında", "Xurme Kürtçe-Türkçe sözlük, Kürtçe ve Türkçe dilleri arası sözlük hizmeti sağlamayı hedefleyen bir projedir. Site tasarımı dikkat dağıtıcı unsurlardan uzak; modern ve sade tasarlanmıştır. Site Python, HTML, CSS, JavaScript teknolojileri kullanılarak geliştirilmiş olup sitenin kaynak kodları kullanıcıların erişimine açıktır. Sitenin kaynak kodlarına ilgili adresten ulaşılabilir."),
-    ("iletisim.html", "İletişim", "Xurme Kürtçe - Türkçe Sözlük ve içerikleri hakkında talepleriniz, önerileriniz ve şikayetleriniz için belirtilen mail adresini kullanabilirsiniz: <a href='mailto:projectxurme@gmail.com'>projectxurme@gmail.com</a>"),
-    ("gizlilik.html", "Gizlilik Politikası", "Web sayfası içinde giriş-kayıt ve cookie gibi kullanıcı verilerini talep eden ve toplayan sistemler bulunmamaktadır. Gizlilik ile ilgili herhangi bir soru veya talepleriniz varsa, belirtilen mail adresini kullanabilirsiniz: <a href='mailto:projectxurme@gmail.com'>projectxurme@gmail.com</a>")
+    ("iletisim.html", "İletişim", "Xurme Kürtçe - Türkçe Sözlük ve içerikleri hakkında talepleriniz, önerileriniz ve şikayetleriniz için belirtilen mail adresini kullanabilirsiniz: <a href='mailto:projectxurme@gmail.com'>projectxurme@gmail.com</a>")
 ]:
     with open(os.path.join(base_dir, sayfa), "w", encoding="utf-8") as f:
         f.write(f"""<!DOCTYPE html>
