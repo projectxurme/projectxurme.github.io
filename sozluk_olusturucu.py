@@ -114,6 +114,7 @@ with open(index_yolu, "w", encoding="utf-8") as index:
 <head>
     <meta charset="UTF-8">
     <title>Xurme Kürtçe - Türkçe Sözlük</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {ortak_css}
     <style>
@@ -143,6 +144,10 @@ with open(index_yolu, "w", encoding="utf-8") as index:
         li {{ margin: 12px 0; }}
         a {{ text-decoration: none; color: #0066cc; font-size: 20px; }}
         a:hover {{ text-decoration: underline; }}
+        #gozat {{
+            font-size: 18px;
+            margin-top: 30px;
+        }}
     </style>
 </head>
 <body>
@@ -155,6 +160,7 @@ with open(index_yolu, "w", encoding="utf-8") as index:
             <button id="btn-turkce" onclick="degistir('turkce')">Türkçe</button>
         </div>
         <input type="text" id="arama" placeholder="Ara..." oninput="ara()">
+        <div id="gozat"></div>
         <ul id="sonuclar"></ul>
     </div>
     <div class="footer">
@@ -190,14 +196,22 @@ with open(index_yolu, "w", encoding="utf-8") as index:
                 }}
             }});
         }}
+
+    window.onload = function() {{
+        const rastgele = veriler[Math.floor(Math.random() * veriler.length)];
+        const kelime = rastgele[0];
+        const link = '<strong>Göz at:</strong> <a href="sayfalar/' + kelime + '.html">' + kelime + '</a>';
+        document.getElementById("gozat").innerHTML = link;
+    }}
+        
     </script>
 </body>
 </html>""")
 
 # sabit sayfaları oluşturmak için ayrılan alan
-for sayfa, baslik, icerik in [
-    ("hakkinda.html", "Hakkında", "Xurme Kürtçe-Türkçe sözlük, Kürtçe ve Türkçe dilleri arası sözlük hizmeti sağlamayı hedefleyen bir projedir. Site tasarımı dikkat dağıtıcı unsurlardan uzak; modern ve sade tasarlanmıştır. Site Python, HTML, CSS, JavaScript teknolojileri kullanılarak geliştirilmiş olup sitenin kaynak kodları kullanıcıların erişimine açıktır. Sitenin kaynak kodlarına ilgili adresten ulaşılabilir."),
-    ("iletisim.html", "İletişim", "Xurme Kürtçe - Türkçe Sözlük ve içerikleri hakkında talepleriniz, önerileriniz ve şikayetleriniz için belirtilen mail adresini kullanabilirsiniz: <a href='mailto:projectxurme@gmail.com'>projectxurme@gmail.com</a>")
+for sayfa, baslik, icerik, ekicerik in [
+    ("hakkinda.html", "Hakkında", "Xurme Kürtçe-Türkçe Sözlük, Kürtçe dilini öğrenmek isteyen ve merakları olan kullanıcıların kelime anlamlarına hızlı ve doğru bir şekilde erişimini sağlamak, dil öğrenme süreçlerine destek olmak amacıyla kurulmuş olan açık kaynak kodlu bir projedir. Proje, ismini Kürtçe 'hurma' anlamına gelen 'xurme' kelimesinden almaktadır.", "Bu proje açık kaynak kodludur. Projenin kaynak kodlarına ve ana sayfasına ulaşmak için:  <a href='https://github.com/projectxurme/projectxurme.github.io'>Proje Ana Sayfası - GitHub</a>"),
+    ("iletisim.html", "İletişim", "Geliştirici ekibimizle iletişime geçmek; soru ve taleplerinizi bildirmek için ilgili iletişim adresini kullanabilirsiniz.", "Bizimle iletişime geçin: <a href='mailto:projectxurme@gmail.com'>projectxurme@gmail.com</a>")
 ]:
     with open(os.path.join(base_dir, sayfa), "w", encoding="utf-8") as f:
         f.write(f"""<!DOCTYPE html>
@@ -205,6 +219,7 @@ for sayfa, baslik, icerik in [
 <head>
     <meta charset="UTF-8">
     <title>{baslik}</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {ortak_css}
     <style>
@@ -219,6 +234,7 @@ for sayfa, baslik, icerik in [
     <div class="container">
         <h1>{baslik}</h1>
         <p>{icerik}</p>
+        <p>{ekicerik}</p>
     </div>
 </body>
 </html>""")

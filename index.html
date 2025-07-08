@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Xurme Kürtçe - Türkçe Sözlük</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
 <style>
@@ -73,6 +74,10 @@
         li { margin: 12px 0; }
         a { text-decoration: none; color: #0066cc; font-size: 20px; }
         a:hover { text-decoration: underline; }
+        #gozat {
+            font-size: 18px;
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -85,6 +90,7 @@
             <button id="btn-turkce" onclick="degistir('turkce')">Türkçe</button>
         </div>
         <input type="text" id="arama" placeholder="Ara..." oninput="ara()">
+        <div id="gozat"></div>
         <ul id="sonuclar"></ul>
     </div>
     <div class="footer">
@@ -120,6 +126,14 @@
                 }
             });
         }
+
+    window.onload = function() {
+        const rastgele = veriler[Math.floor(Math.random() * veriler.length)];
+        const kelime = rastgele[0];
+        const link = '<strong>Göz at:</strong> <a href="sayfalar/' + kelime + '.html">' + kelime + '</a>';
+        document.getElementById("gozat").innerHTML = link;
+    }
+        
     </script>
 </body>
 </html>
