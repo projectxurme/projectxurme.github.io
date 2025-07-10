@@ -2,28 +2,34 @@
 import os
 import csv
 import json
-#sayfalar klasoru kontrol edilir, yoksa olusturulur
-base_dir = os.path.dirname(os.path.abspath(__file__))
-klasor_yolu = os.path.join(base_dir, "sayfalar")
-if not os.path.exists(klasor_yolu):
-    os.mkdir(klasor_yolu)
-#csv verileri islenir
-csv_yolu = os.path.join(base_dir, "veriler.csv")
-with open(csv_yolu, newline='', encoding="utf-8") as csvfile:
-    reader = csv.reader(csvfile)
-    veriler = sorted(list(reader), key=lambda x: x[0].lower())
+import unicodedata
 
-# ortak stil sayfalarını olusturan kod blogu
-ortak_css = """
+#klasor yolu olusturma
+base_dir = os.path.dirname(os.path.abspath(__file__))
+folder_path = os.path.join(base_dir, "sayfalar")
+if not os.path.exists(folder_path):
+    os.mkdir(folder_path)
+
+csv_path = os.path.join(base_dir, "veriler.csv")
+with open(csv_path, newline='', encoding="utf-8") as csvfile:
+    reader = csv.reader(csvfile)
+    all_data = sorted(list(reader), key=lambda x: x[0].lower())
+
+def normalize_word(k):
+    # uyumsuz karakterleri duzeltme fonksiyonu
+    return ''.join(c for c in unicodedata.normalize('NFKD', k) if not unicodedata.combining(c)).lower().replace(" ", "_")
+
+# olusturulan sayfaların ortak css dosyası
+joint_css = """
 <style>
     body {
-        font-family: 'Segoe UI', Tahoma, sans-serif;
+        font-family: 'Tahoma', "Geneva", sans-serif;
         margin: 0;
         background-color: #f4f4f4;
         color: #222;
     }
     .navbar {
-        background: #228F42;
+        background: #D35B3F;
         color: white;
         padding: 15px 20px;
         display: flex;
@@ -50,35 +56,36 @@ ortak_css = """
         font-size: 16px;
     }
     .footer a {
-        color: #0066cc;
+        color: #31595E;
         text-decoration: none;
         margin: 0 10px;
     }
 </style>
 """
 
-#islenen verilerle sayfalar olusturur
-for veri in veriler:
-    kelime, tur, turkce, ekstra = veri
-    dosya_yolu = os.path.join(klasor_yolu, f"{kelime}.html")
-    with open(dosya_yolu, "w", encoding="utf-8") as f:
+# sözlük sayfalarını oluştur
+for data in all_data:
+    kurdish, wordtype, turkish, extra = data
+    file_name = normalize_word(kurdish)
+    file_path = os.path.join(folder_path, f"{file_name}.html")
+    with open(file_path, "w", encoding="utf-8") as f:
         f.write(f"""<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>{kelime}</title>
+    <title>{kurdish}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {ortak_css}
+    {joint_css}
     <style>
         h1 {{ font-size: 42px; }}
-        .tur {{ font-style: italic; color: gray; font-size: 18px; margin-bottom: 20px; }}
+        .wordtype {{ font-style: italic; color: gray; font-size: 18px; margin-bottom: 20px; }}
         p {{ font-size: 22px; line-height: 1.6em; }}
-        .ekstra {{
+        .extra {{
             margin-top: 30px;
             font-size: 18px;
             background: #e8f5e9;
             padding: 15px;
-            border-left: 5px solid #228F42;
+            border-left: 5px solid #FF6F3C;
             border-radius: 6px;
             color: #222;
         }}
@@ -89,34 +96,34 @@ for veri in veriler:
         <a href="../index.html">Ana sayfa</a>
     </div>
     <div class="container">
-        <h1>{kelime}</h1>
-        <div class="tur">{tur}</div>
-        <p>{turkce}</p>
-        <div class="ekstra">{ekstra}</div>
+        <h1>{kurdish}</h1>
+        <div class="wordtype">{wordtype}</div>
+        <p>{turkish}</p>
+        <div class="extra">{extra}</div>
     </div>
     <div class="footer">
-        <a href="../hakkinda.html">hakkında</a> |
-        <a href="../iletisim.html">iletişim</a>
+        <a href="../hakkinda.html">Hakkında</a> |
+        <a href="../iletisim.html">İletişim</a>
     </div>
 </body>
 </html>""")
 
-#arama sistemi için json hazır ediliyor
-veri_json_yolu = os.path.join(base_dir, "veriler.js")
-with open(veri_json_yolu, "w", encoding="utf-8") as f:
-    f.write("const veriler = " + json.dumps(veriler, ensure_ascii=False) + ";")
+# all_data.js oluştur (sözlük verilerini aramada kullanmak için)
+data_json_path = os.path.join(base_dir, "all_data.js")
+with open(data_json_path, "w", encoding="utf-8") as f:
+    f.write("const all_data = " + json.dumps(all_data, ensure_ascii=False) + ";")
 
-# index.html ana sayfa olusturumu
-index_yolu = os.path.join(base_dir, "index.html")
-with open(index_yolu, "w", encoding="utf-8") as index:
+# index.html oluştur (sözlük anasayfası)
+index_path = os.path.join(base_dir, "index.html")
+with open(index_path, "w", encoding="utf-8") as index:
     index.write(f"""<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <title>Xurme Kürtçe - Türkçe Sözlük</title>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {ortak_css}
+    {joint_css}
     <style>
         h2 {{ font-size: 28px; }}
         .switcher {{ display: flex; gap: 20px; justify-content:center; margin-bottom: 20px; }}
@@ -124,13 +131,13 @@ with open(index_yolu, "w", encoding="utf-8") as index:
             padding: 8px 20px;
             border: none;
             border-radius: 20px;
-            background: #228F42;
+            background: #718c6a;
             color: white;
             cursor: pointer;
             font-weight: bold;
         }}
-        .switcher button.active {{ background: #155f2a; }}
-        #arama {{
+        .switcher button.active {{ background: #384635; }}
+        #search {{
             width: 60%;
             padding: 12px 16px;
             margin: 0 auto 25px auto;
@@ -144,7 +151,7 @@ with open(index_yolu, "w", encoding="utf-8") as index:
         li {{ margin: 12px 0; }}
         a {{ text-decoration: none; color: #0066cc; font-size: 20px; }}
         a:hover {{ text-decoration: underline; }}
-        #gozat {{
+        #suggested_word {{
             font-size: 18px;
             margin-top: 30px;
         }}
@@ -156,72 +163,75 @@ with open(index_yolu, "w", encoding="utf-8") as index:
     </div>
     <div class="container">
         <div class="switcher">
-            <button id="btn-kurtce" class="active" onclick="degistir('kurtce')">Kürtçe</button>
-            <button id="btn-turkce" onclick="degistir('turkce')">Türkçe</button>
+            <button id="btn-kurd" class="active" onclick="change_lang('kurdish')">Kürtçe (Kurmanci)</button>
+            <button id="btn-turkish" onclick="change_lang('turkish')">Türkçe</button>
         </div>
-        <input type="text" id="arama" placeholder="Ara..." oninput="ara()">
-        <div id="gozat"></div>
-        <ul id="sonuclar"></ul>
+        <input type="text" id="search" placeholder="Ara..." oninput="search()">
+        <div id="suggested_word"></div>
+        <ul id="results"></ul>
     </div>
     <div class="footer">
         <a href="hakkinda.html">Hakkında</a> |
         <a href="iletisim.html">İletişim</a>
     </div>
-    <script src="veriler.js"></script>
+    <script src="all_data.js"></script>
     <script>
-        let aramaModu = "kurtce";
+        let search_mode = "kurdish";
 
-        function degistir(mod) {{
-            aramaModu = mod;
-            document.getElementById("btn-kurtce").classList.toggle("active", mod === "kurtce");
-            document.getElementById("btn-turkce").classList.toggle("active", mod === "turkce");
-            ara();
+        function normalize_word(str) {{
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/ /g, "_");
         }}
 
-        function ara() {{
-            const q = document.getElementById("arama").value.toLowerCase();
-            const ul = document.getElementById("sonuclar");
+        function change_lang(mod) {{
+            search_mode = mod;
+            document.getElementById("btn-kurd").classList.toggle("active", mod === "kurdish");
+            document.getElementById("btn-turkish").classList.toggle("active", mod === "turkish");
+            search();
+        }}
+
+        function search() {{
+            const q = document.getElementById("search").value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ /g, "_");
+            const ul = document.getElementById("results");
             ul.innerHTML = "";
 
             if(q.length < 2) return;
 
-            veriler.forEach(v => {{
-                const kelime = v[0].toLowerCase();
-                const anlam = v[2].toLowerCase();
-                if((aramaModu === "kurtce" && kelime.includes(q)) || (aramaModu === "turkce" && anlam.includes(q))) {{
-                    let gosterilen = aramaModu === "kurtce" ? v[0] : v[2];
+            all_data.forEach(v => {{
+                const kurdish = normalize_word(v[0]);
+                const turkishword = normalize_word(v[2]);
+                if((search_mode === "kurdish" && kurdish.includes(q)) || (search_mode === "turkish" && turkishword.includes(q))) {{
+                    let shown = search_mode === "kurdish" ? v[0] : v[2];
                     const li = document.createElement("li");
-                    li.innerHTML = '<a href="sayfalar/' + v[0] + '.html">' + gosterilen + '</a>';
+                    li.innerHTML = '<a href="sayfalar/' + kurdish + '.html">' + shown + '</a>';
                     ul.appendChild(li);
                 }}
             }});
         }}
 
-    window.onload = function() {{
-        const rastgele = veriler[Math.floor(Math.random() * veriler.length)];
-        const kelime = rastgele[0];
-        const link = '<strong>Göz at:</strong> <a href="sayfalar/' + kelime + '.html">' + kelime + '</a>';
-        document.getElementById("gozat").innerHTML = link;
-    }}
-        
+        window.onload = function() {{
+            const random_word = all_data[Math.floor(Math.random() * all_data.length)];
+            const kurdish = random_word[0];
+            const link = '<strong>Göz at:</strong> <a href="sayfalar/' + normalize_word(kurdish) + '.html">' + kurdish + '</a>';
+            document.getElementById("suggested_word").innerHTML = link;
+        }}
     </script>
 </body>
 </html>""")
 
-# sabit sayfaları oluşturmak için ayrılan alan
-for sayfa, baslik, icerik, ekicerik in [
-    ("hakkinda.html", "Hakkında", "Xurme Kürtçe-Türkçe Sözlük, Kürtçe dilini öğrenmek isteyen ve merakları olan kullanıcıların kelime anlamlarına hızlı ve doğru bir şekilde erişimini sağlamak, dil öğrenme süreçlerine destek olmak amacıyla kurulmuş olan açık kaynak kodlu bir projedir. Proje, ismini Kürtçe 'hurma' anlamına gelen 'xurme' kelimesinden almaktadır.", "Bu proje açık kaynak kodludur. Projenin kaynak kodlarına ve ana sayfasına ulaşmak için:  <a href='https://github.com/projectxurme/projectxurme.github.io'>Proje Ana Sayfası - GitHub</a>"),
+# sabit sayfaları oluştur
+for page, title, content, extracontent in [
+    ("hakkinda.html", "Hakkında", "<b> Xurme Kürtçe - Türkçe Sözlük:</b> Kürtçe - Türkçe Sözlük ihtiyacına sunulan çözümlerden birisi olmak amacıyla geliştirilen, kar amacı gütmeyen bir projedir. Misyonumuz hem Kürtçe'yi dijital ortamlarda daha görünür kılmak, hem de Kürtçe dili ile çalışma yapmak isteyen veya bu dili öğrenen kullanıcılara erişilebilir, güncel ve güvenilir bir sözlük kaynağı sunmaktır.", "Bu proje açık kaynak kodludur. Projenin kaynak kodlarına ve ana sayfasına ulaşmak için:  <a href='https://github.com/projectxurme/projectxurme.github.io'>Proje Ana Sayfası - GitHub</a>"),
     ("iletisim.html", "İletişim", "Geliştirici ekibimizle iletişime geçmek; soru ve taleplerinizi bildirmek için ilgili iletişim adresini kullanabilirsiniz.", "Bizimle iletişime geçin: <a href='mailto:projectxurme@gmail.com'>projectxurme@gmail.com</a>")
 ]:
-    with open(os.path.join(base_dir, sayfa), "w", encoding="utf-8") as f:
+    with open(os.path.join(base_dir, page), "w", encoding="utf-8") as f:
         f.write(f"""<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>{baslik}</title>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>{title}</title>
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {ortak_css}
+    {joint_css}
     <style>
         h1 {{ font-size: 32px; margin-bottom: 20px; }}
         p {{ font-size: 18px; line-height: 1.6em; }}
@@ -232,9 +242,9 @@ for sayfa, baslik, icerik, ekicerik in [
         <a href="index.html">Ana Sayfa</a>
     </div>
     <div class="container">
-        <h1>{baslik}</h1>
-        <p>{icerik}</p>
-        <p>{ekicerik}</p>
+        <h1>{title}</h1>
+        <p>{content}</p>
+        <p>{extracontent}</p>
     </div>
 </body>
 </html>""")

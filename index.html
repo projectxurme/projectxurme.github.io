@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Xurme Kürtçe - Türkçe Sözlük</title>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
 <style>
     body {
-        font-family: 'Segoe UI', Tahoma, sans-serif;
+        font-family: 'Tahoma', "Geneva", sans-serif;
         margin: 0;
         background-color: #f4f4f4;
         color: #222;
     }
     .navbar {
-        background: #228F42;
+        background: #D35B3F;
         color: white;
         padding: 15px 20px;
         display: flex;
@@ -41,7 +41,7 @@
         font-size: 16px;
     }
     .footer a {
-        color: #0066cc;
+        color: #31595E;
         text-decoration: none;
         margin: 0 10px;
     }
@@ -54,13 +54,13 @@
             padding: 8px 20px;
             border: none;
             border-radius: 20px;
-            background: #228F42;
+            background: #718c6a;
             color: white;
             cursor: pointer;
             font-weight: bold;
         }
-        .switcher button.active { background: #155f2a; }
-        #arama {
+        .switcher button.active { background: #384635; }
+        #search {
             width: 60%;
             padding: 12px 16px;
             margin: 0 auto 25px auto;
@@ -74,7 +74,7 @@
         li { margin: 12px 0; }
         a { text-decoration: none; color: #0066cc; font-size: 20px; }
         a:hover { text-decoration: underline; }
-        #gozat {
+        #suggested_word {
             font-size: 18px;
             margin-top: 30px;
         }
@@ -86,54 +86,57 @@
     </div>
     <div class="container">
         <div class="switcher">
-            <button id="btn-kurtce" class="active" onclick="degistir('kurtce')">Kürtçe</button>
-            <button id="btn-turkce" onclick="degistir('turkce')">Türkçe</button>
+            <button id="btn-kurd" class="active" onclick="change_lang('kurdish')">Kürtçe (Kurmanci)</button>
+            <button id="btn-turkish" onclick="change_lang('turkish')">Türkçe</button>
         </div>
-        <input type="text" id="arama" placeholder="Ara..." oninput="ara()">
-        <div id="gozat"></div>
-        <ul id="sonuclar"></ul>
+        <input type="text" id="search" placeholder="Ara..." oninput="search()">
+        <div id="suggested_word"></div>
+        <ul id="results"></ul>
     </div>
     <div class="footer">
         <a href="hakkinda.html">Hakkında</a> |
         <a href="iletisim.html">İletişim</a>
     </div>
-    <script src="veriler.js"></script>
+    <script src="all_data.js"></script>
     <script>
-        let aramaModu = "kurtce";
+        let search_mode = "kurdish";
 
-        function degistir(mod) {
-            aramaModu = mod;
-            document.getElementById("btn-kurtce").classList.toggle("active", mod === "kurtce");
-            document.getElementById("btn-turkce").classList.toggle("active", mod === "turkce");
-            ara();
+        function normalize_word(str) {
+            return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/ /g, "_");
         }
 
-        function ara() {
-            const q = document.getElementById("arama").value.toLowerCase();
-            const ul = document.getElementById("sonuclar");
+        function change_lang(mod) {
+            search_mode = mod;
+            document.getElementById("btn-kurd").classList.toggle("active", mod === "kurdish");
+            document.getElementById("btn-turkish").classList.toggle("active", mod === "turkish");
+            search();
+        }
+
+        function search() {
+            const q = document.getElementById("search").value.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ /g, "_");
+            const ul = document.getElementById("results");
             ul.innerHTML = "";
 
             if(q.length < 2) return;
 
-            veriler.forEach(v => {
-                const kelime = v[0].toLowerCase();
-                const anlam = v[2].toLowerCase();
-                if((aramaModu === "kurtce" && kelime.includes(q)) || (aramaModu === "turkce" && anlam.includes(q))) {
-                    let gosterilen = aramaModu === "kurtce" ? v[0] : v[2];
+            all_data.forEach(v => {
+                const kurdish = normalize_word(v[0]);
+                const turkishword = normalize_word(v[2]);
+                if((search_mode === "kurdish" && kurdish.includes(q)) || (search_mode === "turkish" && turkishword.includes(q))) {
+                    let shown = search_mode === "kurdish" ? v[0] : v[2];
                     const li = document.createElement("li");
-                    li.innerHTML = '<a href="sayfalar/' + v[0] + '.html">' + gosterilen + '</a>';
+                    li.innerHTML = '<a href="sayfalar/' + kurdish + '.html">' + shown + '</a>';
                     ul.appendChild(li);
                 }
             });
         }
 
-    window.onload = function() {
-        const rastgele = veriler[Math.floor(Math.random() * veriler.length)];
-        const kelime = rastgele[0];
-        const link = '<strong>Göz at:</strong> <a href="sayfalar/' + kelime + '.html">' + kelime + '</a>';
-        document.getElementById("gozat").innerHTML = link;
-    }
-        
+        window.onload = function() {
+            const random_word = all_data[Math.floor(Math.random() * all_data.length)];
+            const kurdish = random_word[0];
+            const link = '<strong>Göz at:</strong> <a href="sayfalar/' + normalize_word(kurdish) + '.html">' + kurdish + '</a>';
+            document.getElementById("suggested_word").innerHTML = link;
+        }
     </script>
 </body>
 </html>
