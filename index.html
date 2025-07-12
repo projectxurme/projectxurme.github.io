@@ -14,26 +14,32 @@
         color: #222;
     }
     .navbar {
-        background: #D35B3F;
+        background: #e6e6e6;
         color: white;
         padding: 15px 20px;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-    .navbar a {
-        color: white;
-        text-decoration: none;
+    .navbar .title-text {
         font-weight: bold;
-        margin: 0 15px;
+        color: #203a3d;
+        font-family: "Palatino Linotype", sans-serif;
+        text-transform: capitalize;
+        white-space: nowrap;
+        font-size: clamp(24px, 4vw, 28px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0;
     }
     .container {
         max-width: 900px;
         margin: 40px auto;
         padding: 30px;
         background: white;
-        border-radius: 12px;
+        border-radius: 24px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background: rgba(255, 255, 255, 0.5); 
     }
     .footer {
         text-align:center;
@@ -53,7 +59,7 @@
         .switcher button {
             padding: 8px 20px;
             border: none;
-            border-radius: 20px;
+            border-radius: 24px;
             background: #718c6a;
             color: white;
             cursor: pointer;
@@ -66,7 +72,7 @@
             margin: 0 auto 25px auto;
             font-size: 18px;
             border: 1px solid #ccc;
-            border-radius: 10px;
+            border-radius: 24px;
             display: block;
             outline: none;
         }
@@ -82,7 +88,7 @@
 </head>
 <body>
     <div class="navbar">
-        <h1 style="margin: 0 auto;">Xurme Kürtçe - Türkçe Sözlük</h1>
+        <h1 class="title-text">Xurme Kürtçe - Türkçe Sözlük</h1>
     </div>
     <div class="container">
         <div class="switcher">
@@ -124,8 +130,9 @@
                 const turkishword = normalize_word(v[2]);
                 if((search_mode === "kurdish" && kurdish.includes(q)) || (search_mode === "turkish" && turkishword.includes(q))) {
                     let shown = search_mode === "kurdish" ? v[0] : v[2];
+                    const filename = normalize_word(kurdish.split(",")[0].trim());
                     const li = document.createElement("li");
-                    li.innerHTML = '<a href="sayfalar/' + kurdish + '.html">' + shown + '</a>';
+                    li.innerHTML = '<a href="sayfalar/' + filename + '.html">' + shown + '</a>';
                     ul.appendChild(li);
                 }
             });
@@ -134,7 +141,8 @@
         window.onload = function() {
             const random_word = all_data[Math.floor(Math.random() * all_data.length)];
             const kurdish = random_word[0];
-            const link = '<strong>Göz at:</strong> <a href="sayfalar/' + normalize_word(kurdish) + '.html">' + kurdish + '</a>';
+            const filename = normalize_word(kurdish.split(",")[0].trim());
+            const link = '<strong>Göz at:</strong> <a href="sayfalar/' + filename + '.html">' + kurdish + '</a>';
             document.getElementById("suggested_word").innerHTML = link;
         }
     </script>

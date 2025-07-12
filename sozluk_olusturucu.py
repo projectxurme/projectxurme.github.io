@@ -17,6 +17,7 @@ with open(csv_path, newline='', encoding="utf-8") as csvfile:
 
 def normalize_word(k):
     # uyumsuz karakterleri duzeltme fonksiyonu
+    k = k.split(",")[0].strip()
     return ''.join(c for c in unicodedata.normalize('NFKD', k) if not unicodedata.combining(c)).lower().replace(" ", "_")
 
 # olusturulan sayfaların ortak css dosyası
@@ -29,26 +30,32 @@ joint_css = """
         color: #222;
     }
     .navbar {
-        background: #D35B3F;
+        background: #e6e6e6;
         color: white;
         padding: 15px 20px;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-    .navbar a {
-        color: white;
-        text-decoration: none;
+    .navbar .title-text {
         font-weight: bold;
-        margin: 0 15px;
+        color: #203a3d;
+        font-family: "Palatino Linotype", sans-serif;
+        text-transform: capitalize;
+        white-space: nowrap;
+        font-size: clamp(24px, 4vw, 28px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0;
     }
     .container {
         max-width: 900px;
         margin: 40px auto;
         padding: 30px;
         background: white;
-        border-radius: 12px;
+        border-radius: 24px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background: rgba(255, 255, 255, 0.5); 
     }
     .footer {
         text-align:center;
@@ -85,15 +92,15 @@ for data in all_data:
             font-size: 18px;
             background: #e8f5e9;
             padding: 15px;
-            border-left: 5px solid #FF6F3C;
-            border-radius: 6px;
+            border-left: 5px solid #365e58;
+            border-radius: 24px;
             color: #222;
         }}
     </style>
 </head>
 <body>
     <div class="navbar">
-        <a href="../index.html">Ana sayfa</a>
+        <a href="../index.html" style="text-decoration: none; color: #203a3d; font-size: 16px;">Ana Sayfa</a>
     </div>
     <div class="container">
         <h1>{kurdish}</h1>
@@ -130,7 +137,7 @@ with open(index_path, "w", encoding="utf-8") as index:
         .switcher button {{
             padding: 8px 20px;
             border: none;
-            border-radius: 20px;
+            border-radius: 24px;
             background: #718c6a;
             color: white;
             cursor: pointer;
@@ -143,7 +150,7 @@ with open(index_path, "w", encoding="utf-8") as index:
             margin: 0 auto 25px auto;
             font-size: 18px;
             border: 1px solid #ccc;
-            border-radius: 10px;
+            border-radius: 24px;
             display: block;
             outline: none;
         }}
@@ -159,7 +166,7 @@ with open(index_path, "w", encoding="utf-8") as index:
 </head>
 <body>
     <div class="navbar">
-        <h1 style="margin: 0 auto;">Xurme Kürtçe - Türkçe Sözlük</h1>
+        <h1 class="title-text">Xurme Kürtçe - Türkçe Sözlük</h1>
     </div>
     <div class="container">
         <div class="switcher">
@@ -201,8 +208,9 @@ with open(index_path, "w", encoding="utf-8") as index:
                 const turkishword = normalize_word(v[2]);
                 if((search_mode === "kurdish" && kurdish.includes(q)) || (search_mode === "turkish" && turkishword.includes(q))) {{
                     let shown = search_mode === "kurdish" ? v[0] : v[2];
+                    const filename = normalize_word(kurdish.split(",")[0].trim());
                     const li = document.createElement("li");
-                    li.innerHTML = '<a href="sayfalar/' + kurdish + '.html">' + shown + '</a>';
+                    li.innerHTML = '<a href="sayfalar/' + filename + '.html">' + shown + '</a>';
                     ul.appendChild(li);
                 }}
             }});
@@ -211,7 +219,8 @@ with open(index_path, "w", encoding="utf-8") as index:
         window.onload = function() {{
             const random_word = all_data[Math.floor(Math.random() * all_data.length)];
             const kurdish = random_word[0];
-            const link = '<strong>Göz at:</strong> <a href="sayfalar/' + normalize_word(kurdish) + '.html">' + kurdish + '</a>';
+            const filename = normalize_word(kurdish.split(",")[0].trim());
+            const link = '<strong>Göz at:</strong> <a href="sayfalar/' + filename + '.html">' + kurdish + '</a>';
             document.getElementById("suggested_word").innerHTML = link;
         }}
     </script>
@@ -239,7 +248,7 @@ for page, title, content, extracontent in [
 </head>
 <body>
     <div class="navbar">
-        <a href="index.html">Ana Sayfa</a>
+        <a href="index.html" style="text-decoration: none; color: #203a3d; font-size: 16px;">Ana Sayfa</a>
     </div>
     <div class="container">
         <h1>{title}</h1>
