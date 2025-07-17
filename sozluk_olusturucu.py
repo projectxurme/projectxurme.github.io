@@ -183,6 +183,7 @@ with open(index_path, "w", encoding="utf-8") as index:
         <a href="hakkinda.html">Hakkında</a> |
         <a href="iletisim.html">İletişim</a>
     </div>
+    <div style="text-align:center; font-size: 14px; color: #999; margin-top: 20px;">Sevgi ile hazırlandı ☙ Bi hezkirin hate amede kirin ❤️</div>
     <script src="all_data.js"></script>
     <script>
         let search_mode = "kurdish";
